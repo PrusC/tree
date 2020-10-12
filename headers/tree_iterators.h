@@ -16,7 +16,6 @@ struct TreeNodeIterator {
 
     TreeNodeIterator(): _node() {}
     TreeNodeIterator(Node<T>* node): _node(node) {}
-//    TreeNodeIterator(const TreeNodeIterator& it): _node(it->_node) {}
 
     TreeNodeIterator<T>& operator++() {
         _node = successor(_node);
@@ -61,7 +60,6 @@ struct TreeNodeConstIterator {
 
     TreeNodeConstIterator(): _node() {}
     TreeNodeConstIterator(Node<T>* node): _node(node) {}
-    TreeNodeConstIterator(const TreeNodeIterator<T>& it): _node(it->_node) {}
 
     TreeNodeConstIterator<T>& operator++() {
         _node = successor(_node);
