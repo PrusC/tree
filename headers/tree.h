@@ -143,7 +143,7 @@ public:
         if(parent ==  nullptr) {
             head.setRoot(z);
             head.setFirst(z);
-//            z->_parent = head.header();
+
         }
         else {
             if(k < parent->_value) {
@@ -163,13 +163,50 @@ public:
 
 
     iterator erase(const T& k) {
-        Node<T>* y = nullptr;
-        Node<T>* x = nullptr;
+//        Node<T>* y = nullptr;
+//        Node<T>* x = nullptr;
         Node<T>* z = search(head.root(), k);
 
         if(z == nullptr) {
-            return end();
+            return iterator(end());
         }
+        Node<T>* node_for_erase = eraseNode(z);
+
+        iterator it = std::next(iterator(node_for_erase));
+        delete node_for_erase;
+        --_size;
+        return it;
+
+    }
+
+
+private:
+
+    TreeHeader<T> head;
+    size_t _size;
+
+    Node<T>* findInsertParent(Node<T> *root, const T& k) {
+        Node<T>* y = nullptr;
+        Node<T>* x = root;
+
+        while(x != nullptr) {
+            if (k == x->_value) {
+                return x;
+            }
+            y = x;
+            if (k < x->_value) {
+                x = x->_left;
+            }
+            else {
+                x = x->_right;
+            }
+        }
+        return y;
+    }
+
+    Node<T>* eraseNode(Node<T>* z) {
+        Node<T>* y = nullptr;
+        Node<T>* x = nullptr;
 
         if(z->_left == nullptr || z->_right == nullptr) {
             y = z;
@@ -199,32 +236,6 @@ public:
         }
         if(y != z) {
             z->_value = y->_value;
-        }
-        _size --;
-        return iterator(y);
-    }
-
-
-private:
-
-    TreeHeader<T> head;
-    size_t _size;
-
-    Node<T>* findInsertParent(Node<T> *root, const T& k) {
-        Node<T>* y = nullptr;
-        Node<T>* x = root;
-
-        while(x != nullptr) {
-            if (k == x->_value) {
-                return x;
-            }
-            y = x;
-            if (k < x->_value) {
-                x = x->_left;
-            }
-            else {
-                x = x->_right;
-            }
         }
         return y;
     }
