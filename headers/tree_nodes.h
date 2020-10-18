@@ -75,7 +75,7 @@ Node<T>* predecessor(Node<T>* x) {
 
 template <class T>
 Node<T>* search(Node<T>* x, const T& k) {
-    if(x == nullptr && k == x->_value) {
+    if(x == nullptr || k == x->_value) {
         return x;
     }
     if(k < x->_value) {

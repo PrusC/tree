@@ -15,44 +15,49 @@ struct TreeHeader {
 
     void reset() {
         _header._parent = nullptr;
-        _header._left = &_header;
+        _header._left = nullptr;
         _header._right = &_header;
     }
 
     Node<T>*& root() {
-        return _header._parent;
+        return _header._left;
     }
 
     const Node<T>* root() const {
-        return _header._parent;
+        return _header._left;
+    }
+
+    void setRoot(Node<T>*& node) {
+        _header._left = node;
+        node->_parent = &_header;
     }
 
     void setRoot(const Node<T>& node) {
         _header._parent = &node;
     }
 
-    Node<T>*& left() {
-        return _header._left;
-    }
-
-    const Node<T>* left() const {
-        return _header._left;
-    }
-
-    Node<T>*& right() {
+    Node<T>*& first() {
         return _header._right;
     }
 
-    const Node<T>* right() const {
+    const Node<T>* first() const {
         return _header._right;
     }
 
-    Node<T>& header() {
-        return _header;
+    void setFirst(Node<T>*& node) {
+        _header._right = node;
     }
 
-    const Node<T> header() const {
-        return _header;
+    void setFirst(const Node<T>& node) {
+        _header._right = node;
+    }
+
+    Node<T>* header() {
+        return &_header;
+    }
+
+    const Node<T>* header() const {
+        return &_header;
     }
 
 };
@@ -68,33 +73,137 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    BinaryTree(): root(), head() {}
+    BinaryTree(): head() {}
 
     bool isEmpty() const {
-        return root == nullptr;
+        return head.root() == nullptr;
     }
 
     iterator find(const T& k) {
-        Node<T>* it = search(root, k);
+        Node<T>* it = search(head.root(), k);
         if(it == nullptr) {
-            return iterator(&head.header());
+            return iterator(head.header());
         }
-        return iterator(search(root, k));
+        return iterator(it);
     }
 
     const_iterator find(const T& k) const {
-        Node<T>* it = search(root, k);
+        Node<T>* it = search(head.root(), k);
         if(it == nullptr) {
-            return const_iterator(&head.header());
+            return const_iterator(head.header());
         }
         return const_iterator(it);
     }
 
+    iterator begin() {
+        return iterator(head.first());
+    }
+
+    const_iterator begin() const {
+        return const_iterator(head.first());
+    }
+
+    iterator end() {
+        return iterator(head.header());
+    }
+
+    const_iterator end() const {
+        return const_iterator(head.header());
+    }
+
+    reverse_iterator rbegin() {
+        return reverse_iterator(end());
+    }
+
+    const_reverse_iterator rbegin() const {
+        return const_reverse_iterator(end());
+    }
+
+    reverse_iterator rend() {
+        return reverse_iterator(begin());
+    }
+
+    const_reverse_iterator rend() const {
+        return const_reverse_iterator(begin());
+    }
+
     iterator insert(const T& k) {
-        Node<T> *y = nullptr;
-        Node<T> *x = root;
+        Node<T>* parent = findInsertParent(head.root(), k);
+
+        if(parent != nullptr && parent->_value == k) {
+            return iterator(parent);
+        }
+
+        Node<T> *z = new Node<T>(k);
+        z->_parent = parent;
+        if(parent ==  nullptr) {
+            head.setRoot(z);
+            head.setFirst(z);
+//            z->_parent = head.header();
+        }
+        else {
+            if(k < parent->_value) {
+                parent->_left = z;
+                if (parent == head.first()) {
+                    head.setFirst(z);
+                }
+            }
+            else {
+                parent->_right = z;
+            }
+        }
+        return iterator(z);
+
+    }
+
+
+    iterator erase(const T& k) {
+        Node<T>* y = nullptr;
+        Node<T>* x = nullptr;
+        Node<T>* z = search(k);
+
+        if(z == nullptr) {
+            return iterator();
+        }
+
+        if(z->_left == nullptr || z->_right == nullptr) {
+            y = z;
+        }
+        else {
+            y = successor(z);
+        }
+
+        if(y->_left != nullptr) {
+            x = y->_left;
+        }
+        else {
+            x = y->_right;
+        }
+
+        if(x != nullptr) {
+            x->_parent = y->_parent;
+        }
+        if(y->_parent == nullptr) {
+            head.setRoot(x);
+//            x->_parent = head.header();
+        }
+
+        return iterator();
+    }
+
+
+private:
+
+    TreeHeader<T> head;
+
+    Node<T>* findInsertParent(Node<T> *root, const T& k) {
+        Node<T>* y = nullptr;
+        Node<T>* x = root;
 
         while(x != nullptr) {
+            if (k == x->_value) {
+                return x;
+            }
             y = x;
             if (k < x->_value) {
                 x = x->_left;
@@ -103,31 +212,8 @@ public:
                 x = x->_right;
             }
         }
-        Node<T> *z = new Node<T>(k);
-        z->_parent = y;
-        if (y == nullptr) {
-            root = z;
-//            head._header._le
-        }
-        else {
-            if (k < y->_value) {
-                y->_left = z;
-            }
-            else {
-                y->_right = z;
-            }
-        }
-        return iterator(z);
+        return y;
     }
-
-    void erase(const T& k) {
-//        if()
-    }
-
-private:
-
-    Node<T>* root;
-    TreeHeader<T> head;
 
 };
 
