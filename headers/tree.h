@@ -73,10 +73,14 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    BinaryTree(): head() {}
+    BinaryTree(): head(), _size() {}
 
     bool isEmpty() const {
         return head.root() == nullptr;
+    }
+
+    size_t size() const {
+        return _size;
     }
 
     iterator find(const T& k) {
@@ -152,6 +156,7 @@ public:
                 parent->_right = z;
             }
         }
+        _size ++;
         return iterator(z);
 
     }
@@ -160,10 +165,10 @@ public:
     iterator erase(const T& k) {
         Node<T>* y = nullptr;
         Node<T>* x = nullptr;
-        Node<T>* z = search(k);
+        Node<T>* z = search(head.root(), k);
 
         if(z == nullptr) {
-            return iterator();
+            return end();
         }
 
         if(z->_left == nullptr || z->_right == nullptr) {
@@ -185,16 +190,25 @@ public:
         }
         if(y->_parent == nullptr) {
             head.setRoot(x);
-//            x->_parent = head.header();
         }
-
-        return iterator();
+        else if(y == y->_parent->_left) {
+            y->_parent->_left = x;
+        }
+        else {
+            y->_parent->_right = x;
+        }
+        if(y != z) {
+            z->_value = y->_value;
+        }
+        _size --;
+        return iterator(y);
     }
 
 
 private:
 
     TreeHeader<T> head;
+    size_t _size;
 
     Node<T>* findInsertParent(Node<T> *root, const T& k) {
         Node<T>* y = nullptr;
