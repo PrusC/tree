@@ -35,7 +35,7 @@ int main()
     for(auto el: s) {
         cout << el << endl;
     }
-    auto at = s.erase(1);
+    auto at = s.erase(-4);
     cout << "next " << *at << endl;
     cout << "--------" << endl;
     for(auto it = s.rbegin(); it != s.rend(); ++it) {

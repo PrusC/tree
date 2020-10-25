@@ -171,11 +171,17 @@ public:
             return iterator(end());
         }
         Node<T>* node_for_erase = eraseNode(z);
+        Node<T>* next_node_for_erase = successor(node_for_erase);
 
-        iterator it = std::next(iterator(node_for_erase));
+        if(node_for_erase == head.first()) {
+            head.setFirst(next_node_for_erase);
+        }
+        if(node_for_erase == head.root()) {
+            head.reset();
+        }
         delete node_for_erase;
         --_size;
-        return it;
+        return iterator(next_node_for_erase);
 
     }
 
